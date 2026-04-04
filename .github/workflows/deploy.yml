@@ -10,6 +10,8 @@ env:
   DIGITALOCEAN_TOKEN: ${{ secrets.DO_PAT }}
   AWS_ACCESS_KEY_ID: ${{ secrets.SPACES_ACCESS_KEY }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.SPACES_SECRET_KEY }}
+  SPACES_ACCESS_KEY_ID: ${{ secrets.SPACES_ACCESS_KEY }}
+  SPACES_SECRET_ACCESS_KEY: ${{ secrets.SPACES_SECRET_KEY }}
 
 jobs:
   terraform-deploy:
