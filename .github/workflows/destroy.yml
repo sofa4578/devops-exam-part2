@@ -1,0 +1,29 @@
+name: Destroy Infrastructure (Task 1)
+
+on:
+  workflow_dispatch:
+
+env:
+  DIGITALOCEAN_TOKEN: ${{ secrets.DO_PAT }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.SPACES_ACCESS_KEY }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.SPACES_SECRET_KEY }}
+
+jobs:
+  terraform-destroy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./task1
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve
