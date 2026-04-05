@@ -1,0 +1,48 @@
+name: Setup Minikube (Task 2)
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_ip:
+        description: 'IP-адреса сервера для встановлення (з DigitalOcean)'
+        required: true
+        type: string
+
+jobs:
+  ansible-check:
+    name: Dry Run Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Run Ansible Syntax Check
+        run: |
+          cd task2
+          ansible-playbook -i "${{ github.event.inputs.target_ip }}," playbook.yml --syntax-check
+
+  ansible-deploy:
+    name: Install Components
+    needs: ansible-check 
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Run Ansible Playbook
+        run: |
+          cd task2
+          # Кома відразу після IP обов'язкова, щоб Ansible зрозумів, що це список хостів
+          ansible-playbook -i "${{ github.event.inputs.target_ip }}," playbook.yml
