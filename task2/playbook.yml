@@ -5,7 +5,12 @@
   tasks:
     - name: Install required system packages
       apt:
-        name:['apt-transport-https', 'ca-certificates', 'curl', 'docker.io', 'conntrack']
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - docker.io
+          - conntrack
         state: present
         update_cache: yes
 
