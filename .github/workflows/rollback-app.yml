@@ -1,0 +1,32 @@
+name: Rollback App (Bonus Task)
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'В якому середовищі зробити відкат (dev чи release)?'
+        required: true
+        type: choice
+        options:
+          - dev
+          - release
+      target_ip:
+        description: 'IP-адреса сервера (Droplet)'
+        required: true
+        type: string
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ github.event.inputs.target_ip }} >> ~/.ssh/known_hosts
+
+      - name: Execute K8s Rollback
+        run: |
+          # Команда K8s для повернення на попередню ревізію
+          ssh root@${{ github.event.inputs.target_ip }} "kubectl rollout undo deployment/devops-exam-app -n ${{ github.event.inputs.environment }}"
