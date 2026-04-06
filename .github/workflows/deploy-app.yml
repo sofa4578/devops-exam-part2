@@ -65,12 +65,15 @@ jobs:
 
       - name: Prepare & Copy Manifest
         run: |
-          # Замінюємо заглушки в файлі на реальні значення
-          sed -i "s|APP_NAMESPACE|${{ github.event.inputs.environment }}|g" task3/app-manifest-template.yml
-          sed -i "s|APP_IMAGE|${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}|g" task3/app-manifest-template.yml
+          # 1. Замінюємо неймспейс
+          sed "s|APP_NAMESPACE|${{ github.event.inputs.environment }}|g" task3/app-manifest-template.yml > final-manifest.yml
+          # 2. Замінюємо образ
+          sed -i "s|APP_IMAGE|${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}|g" final-manifest.yml
+          # 3. Замінюємо порт (8002 або 8003)
+          sed -i "s|APP_NODE_PORT|${{ env.APP_PORT }}|g" final-manifest.yml
           
-          # Копіюємо готовий файл на сервер
-          scp task3/app-manifest-template.yml root@${{ github.event.inputs.target_ip }}:/root/app-manifest.yml
+          # Копіюємо на сервер
+          scp -v final-manifest.yml root@${{ github.event.inputs.target_ip }}:/root/app-manifest.yml
 
       - name: Validation Check (Dry Run)
         run: |
