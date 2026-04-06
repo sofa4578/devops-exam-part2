@@ -27,7 +27,6 @@ jobs:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
     steps:
-      # ЗВЕРНІТЬ УВАГУ: Ми клонуємо репозиторій ВИКЛАДАЧА, а не ваш!
       - name: Checkout Teacher's Repo
         uses: actions/checkout@v4
         with:
@@ -52,7 +51,6 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-      # Тут ми клонуємо ВАШ репозиторій, щоб дістати k8s маніфест
       - name: Checkout My Repo
         uses: actions/checkout@v4
 
@@ -69,8 +67,7 @@ jobs:
           sed "s|APP_NAMESPACE|${{ github.event.inputs.environment }}|g" task3/app-manifest-template.yml > final-manifest.yml
           # 2. Замінюємо образ
           sed -i "s|APP_IMAGE|${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}|g" final-manifest.yml
-          # 3. Замінюємо порт (8002 або 8003)
-          sed -i "s|APP_NODE_PORT|${{ env.APP_PORT }}|g" final-manifest.yml
+
           
           # Копіюємо на сервер
           scp -v final-manifest.yml root@${{ github.event.inputs.target_ip }}:/root/app-manifest.yml
@@ -90,11 +87,11 @@ jobs:
 
       - name: Setup Port Forwarding
         run: |
-          # Вбиваємо старий процес port-forward для цього порту, якщо він був
+          # Вбиваємо старий процес port-forward, щоб не було конфлікту
           ssh root@${{ github.event.inputs.target_ip }} "fuser -k ${{ env.APP_PORT }}/tcp || true"
           
-          # Запускаємо новий port-forward у фоні (nohup)
+          # Запускаємо прокидання порту 8002 (або 8003) на сервіс (порт 80)
+          # --address 0.0.0.0 дозволяє підключатися зовні
           ssh root@${{ github.event.inputs.target_ip }} "nohup kubectl port-forward svc/devops-exam-service ${{ env.APP_PORT }}:80 -n ${{ github.event.inputs.environment }} --address 0.0.0.0 > /root/port-forward-${{ github.event.inputs.environment }}.log 2>&1 &"
           
-          # Даємо секунду на запуск
-          sleep 3
+          sleep 5

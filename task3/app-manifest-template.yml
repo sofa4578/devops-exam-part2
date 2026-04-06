@@ -31,11 +31,10 @@ metadata:
   name: devops-exam-service
   namespace: APP_NAMESPACE
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: devops-exam-app
   ports:
     - protocol: TCP
       port: 80
       targetPort: 8000
-      nodePort: APP_NODE_PORT
