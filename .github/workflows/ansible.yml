@@ -22,10 +22,10 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      - name: Run Ansible Syntax Check
+      - name: Run Ansible Dry Run
         run: |
           cd task2
-          ansible-playbook -i "${{ github.event.inputs.target_ip }}," playbook.yml --syntax-check
+          ansible-playbook -i "${{ github.event.inputs.target_ip }}," playbook.yml --check
 
   ansible-deploy:
     name: Install Components
