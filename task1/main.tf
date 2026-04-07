@@ -1,11 +1,9 @@
-# 1. Віртуальна приватна хмара (VPC)
 resource "digitalocean_vpc" "vpc" {
   name     = "levko-vpc"
   region   = "fra1"
   ip_range = "10.10.10.0/24"
 }
 
-# 2. Сховище для обʼєктів (Бакет)
 resource "digitalocean_spaces_bucket" "bucket" {
   name   = "levko-bucket-${random_id.bucket_suffix.hex}"
   region = "fra1"
@@ -15,7 +13,6 @@ resource "random_id" "bucket_suffix" {
   byte_length = 4
 }
 
-# 3. Віртуальна машина (Droplet) з ключем Ansible
 resource "digitalocean_droplet" "node" {
   name     = "levko-node"
   region   = "fra1"
@@ -25,7 +22,6 @@ resource "digitalocean_droplet" "node" {
   ssh_keys =[digitalocean_ssh_key.ansible_key.id]
 }
 
-# 4. Налаштування фаєрволу
 resource "digitalocean_firewall" "firewall" {
   name = "levko-firewall"
   droplet_ids = [digitalocean_droplet.node.id]
